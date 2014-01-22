@@ -1,0 +1,101 @@
+package Model;
+
+import java.util.List;
+import dao.AtletaDao;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.AbstractTableModel;
+
+public class Tabela extends AbstractTableModel {
+
+    private ArrayList linhas = null;
+    private String[] colunas = null;
+    private String nomeconsulta = null;
+
+    public Tabela(ArrayList lin, String[] col, String nome) {
+        setLinhas(lin);
+        setColunas(col);
+        setNomeconsulta(nome);
+    }
+
+    
+    public Tabela() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    // gets e setters
+    public ArrayList getLinhas() {
+        return linhas;
+    }
+
+    public void setLinhas(ArrayList dados) {
+        linhas = dados;
+    }
+    
+    public String[] getColunas(){
+        return colunas;
+    }
+    public void setColunas(String[] nomes){
+        colunas = nomes;
+    }
+    // conta a quantidade de colunas
+    public int getColumnCount(){
+        return colunas.length;
+    }
+    //conta a quantidade do array de linhas
+    public int getRowCount(){
+        return linhas.size();
+    }
+    
+    public String getColumnName(int numCol){
+        return colunas[numCol];
+    }
+    
+    
+    public Object getValueAt(int numLin, int numCol){
+        
+        Object valor = null;
+        List<Atleta> atleta = new ArrayList();
+        Atleta obj = new Atleta();
+        try {
+            
+        AtletaDao dao = new AtletaDao();    
+        
+        atleta = dao.consulta(nomeconsulta);
+        switch (numCol) {
+            
+        case 0:         
+            valor = atleta.get(numLin).getBicepsesq();
+            break;    
+        case 1:
+            valor = atleta.get(numLin).getBicepsdir();
+            break;
+        case 2:
+            valor = atleta.get(numLin).getBusto();
+            break;
+        case 3:
+            valor = atleta.get(numLin).getAbdmoen();
+            break;
+        case 4:
+            valor = atleta.get(numLin).getImc();
+            break;
+        case 5:
+            valor = atleta.get(numLin).getData();
+            break;      
+        }
+          
+        } catch (SQLException ex) {
+            Logger.getLogger(Tabela.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return valor;
+                
+    }
+
+    
+
+    public void setNomeconsulta(String nomeconsulta) {
+        this.nomeconsulta = nomeconsulta;
+    }
+    
+}
