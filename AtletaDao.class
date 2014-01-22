@@ -1,0 +1,144 @@
+package dao;
+
+import Model.Atleta;
+//import Model.MedidasModel;
+import Model.Tabela;
+import controller.CadastroController;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+public class AtletaDao {
+
+
+private final Connection conexao;
+
+    public AtletaDao() throws SQLException {
+        this.conexao = new factoryConn.Conexao().getConnection();
+    }
+    /* 
+     Inseri todo o cadastro
+     do atleta diretamente no banco
+     */
+
+    public void inserir(Atleta atleta) throws SQLException {
+
+        String sql;
+
+        sql = "insert into atleta (nome,idade,peso,altura,bf,biesq,bidir,coxaesq,coxadir,antebracoesq,"
+                + "antebracodir,panturrilhaesq,panturrilhadir,busto,abdomen,dia,imc)"
+                + "values (?,?,?,?,?,?,?,?,?,?"
+                + ",?,?,?,?,?,curdate(),?)";
+
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+
+        stmt.setString(1, atleta.getNome());
+        stmt.setInt(2, atleta.getIdade());
+        stmt.setDouble(3, atleta.getPeso());
+        stmt.setDouble(4, atleta.getAltura());
+        stmt.setDouble(5, atleta.getBf());
+        stmt.setDouble(6, atleta.getBicepsesq());
+        stmt.setDouble(7, atleta.getBicepsdir());
+        stmt.setDouble(8, atleta.getCoxaesq());
+        stmt.setDouble(9, atleta.getCoxadir());
+        stmt.setDouble(10, atleta.getAntebes());
+        stmt.setDouble(11, atleta.getAntebdir());
+        stmt.setDouble(12, atleta.getPantuesq());
+        stmt.setDouble(13, atleta.getPantudir());
+        stmt.setDouble(14, atleta.getBusto());
+        stmt.setDouble(15, atleta.getAbdmoen());
+        stmt.setDouble(16, atleta.getImc());
+
+        // Executando a instrução SQL
+        stmt.execute();
+        // Efetivando a transação
+        conexao.commit();
+        // Liberando os recursos
+
+        stmt.close();
+        // chama mensagem de Insercao OK
+        CadastroController ctrl = new CadastroController();
+        ctrl.msginserir();
+
+    }
+    /*Efetua a consulta por nome
+     dos atletas e alimenta o combobox
+         
+     */
+
+    public ArrayList<String> preencheJcombo() throws SQLException {
+
+        String sql;
+
+        sql = "select nome from atleta group by nome";
+
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+
+        ResultSet rs = stmt.executeQuery();
+
+        ArrayList<String> nomes = new ArrayList();
+
+        while (rs.next()) {
+            nomes.add(rs.getString("nome"));
+        }
+
+        rs.close();
+        return nomes;
+
+    }
+
+    /* 
+     Realiza a consulta do nome e joga no combo
+     peso e idade e joga no panel2*/
+    public List<Atleta> consulta(String nome) throws SQLException {
+         
+         
+         
+        List<Atleta> result = new ArrayList();
+
+        String sql;
+
+        sql = "select * from atleta where nome = ?  ";
+
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+
+        stmt.setString(1, nome);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Atleta obj = new Atleta();
+            obj.setNome(rs.getString("nome"));
+            obj.setIdade(rs.getInt("idade"));
+            obj.setBicepsesq(rs.getDouble("biesq"));
+            obj.setBicepsdir(rs.getDouble("bidir"));
+            obj.setBusto(rs.getDouble("busto"));
+            obj.setAbdmoen(rs.getDouble("abdomen"));
+            obj.setImc(rs.getDouble("imc"));
+            // montando campo de data
+            // montando a data atraves do calendar  
+            Calendar data  = Calendar.getInstance();  
+            data.setTime(rs.getTimestamp("dia")); 
+            String data2 = new SimpleDateFormat("dd/MM/yyyy").format(data.getTime());  
+            obj.setData(data2);
+ 
+            result.add(obj);// adicionando a lista
+        }
+
+        stmt.execute();
+        // Efetivando a transação
+        conexao.commit();
+        // Liberando os recursos
+        stmt.close();
+        
+        return result;
+    }
+
+    
+
+}// FIM DA CLASSE
