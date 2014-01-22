@@ -1,0 +1,28 @@
+
+
+package factoryConn;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
+public class Conexao {
+   
+    
+    //FABRICA DE CONEXAO COM mYSQL
+    public Connection getConnection() throws SQLException{
+        try{
+            Connection conexao = DriverManager.getConnection("jdbc:mysql://192.168.0.62:3306/monitoracademia","root","123");
+            conexao.setAutoCommit(false);                                //localhost:3306
+            return conexao;
+        }catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "IMPOSSIVEL CONECTAR AO BANCO DE DADOS", "FALHA DE CONEXAO", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(ex);
+        }
+   
+    }
+    
+}
+    
+
